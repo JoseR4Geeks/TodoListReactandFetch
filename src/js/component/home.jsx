@@ -65,7 +65,7 @@ const Home = () => {
   return (
     <div className="container">
       <h1>todos</h1>
-      <div className="shadow">
+      <div className="shadowCSS">
         <ul>
           <li className="textBox">
             <input
