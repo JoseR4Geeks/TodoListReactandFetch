@@ -1,75 +1,64 @@
-// Home.js
-import React, { useState, useEffect } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faX } from '@fortawesome/free-solid-svg-icons';
-import { faTrashRestore } from '@fortawesome/free-solid-svg-icons';
+import React, { useState, useEffect } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faX, faTrashRestore } from "@fortawesome/free-solid-svg-icons";
 
 const Home = () => {
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState("");
   const [todos, setTodos] = useState([]);
+  const API_BASE_URL = "http://localhost:3001";
 
-  const API_BASE_URL = 'http://localhost:3001';
-
-  useEffect(async () => {
-    await fetchTasks();
-    console.log('fetchTasks should have ran already');
+  useEffect(() => {
+    fetchTasks();
   }, []);
 
   const fetchTasks = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/tasks`);
       const data = await response.json();
-  
-      // MAPPING THE ARRAY OF OBJECTS
-      const toDosTask = data.tasks.map((item) => {
-        return { id: item.id, text: item.text }; // Include both task ID and text
-      });
-      setTodos(toDosTask);
+      setTodos(data.tasks);
     } catch (error) {
-      console.error('Error fetching tasks:', error);
+      console.error("Error fetching tasks:", error);
     }
   };
-  
+
   const addTask = async () => {
     try {
       await fetch(`${API_BASE_URL}/tasks`, {
-        method: 'PUT',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ task: inputValue }),
+        body: JSON.stringify({ text: inputValue }),
       });
 
-      fetchTasks();
-      setInputValue('');
+      await fetchTasks();
+      setInputValue("");
     } catch (error) {
-      console.error('Error adding task:', error);
+      console.error("Error adding task:", error);
     }
   };
 
   const deleteTask = async (taskId) => {
     try {
       await fetch(`${API_BASE_URL}/tasks/${taskId}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
-      fetchTasks();
+      setTodos(todos.filter((item) => item.id !== taskId));
     } catch (error) {
-      console.error('Error deleting task:', error);
+      console.error("Error deleting task:", error);
     }
   };
 
   const cleanAllTasks = async () => {
     try {
-      // Send a DELETE request to delete all tasks on the server
       await fetch(`${API_BASE_URL}/tasks`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
-      // Update the frontend by resetting the todos state to an empty array
       setTodos([]);
     } catch (error) {
-      console.error('Error cleaning all tasks:', error);
+      console.error("Error cleaning all tasks:", error);
     }
   };
 
@@ -85,35 +74,26 @@ const Home = () => {
               onChange={(e) => setInputValue(e.target.value)}
               value={inputValue}
               onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  setTodos(todos.concat(inputValue));
-                  setInputValue('');
+                if (e.key === "Enter") {
                   addTask();
                 }
               }}
             />
           </li>
-          {todos.map((item, index) => (
-          <li key={index}>
-            {item.text}
-            <FontAwesomeIcon
-              icon={faX}
-              onClick={() => {
-                setTodos(
-                  todos.filter((t, currentIndex) => index !== currentIndex)
-                );
-                deleteTask(item.id); // Pass the task ID to deleteTask
-              }}
-              style={{ color: '#ff0000' }}
-              className="faIcon delete"
-            />
-          </li>
-        ))}
-
+          {todos.map((item) => (
+            <li key={item.id}>
+              {item.text}
+              <FontAwesomeIcon
+                icon={faX}
+                onClick={() => deleteTask(item.id)}
+                style={{ color: "#ff0000" }}
+                className="faIcon delete"
+              />
+            </li>
+          ))}
         </ul>
         <div className="task">{todos.length} tasks left</div>
       </div>
-
       <div className="page"></div>
       <div className="page2"></div>
       <button onClick={cleanAllTasks} className="CleanAll btn btn-secondary">

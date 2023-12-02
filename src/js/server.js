@@ -18,13 +18,14 @@ app.get('/tasks', (req, res) => {
   res.json({ tasks: todos });
 });
 
-app.put('/tasks', (req, res) => {
-  const { task } = req.body;
-  todos.push([{ id: todos.length + 1, text: task }]);
+app.post('/tasks', (req, res) => {
+  const { text } = req.body;
+  const newTask = { id: todos.length + 1, text };
+  todos.push(newTask);
   res.json({
     success: true,
     message: 'Task added successfully',
-    taskAdded: todos,
+    taskAdded: newTask,
   });
 });
 
