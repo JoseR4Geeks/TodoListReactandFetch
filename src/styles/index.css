@@ -110,3 +110,8 @@ h1 {
 .recycle {
     margin-left: 5px;
 }
+input:focus {
+    border: 1px solid rgb(88, 87, 87); /* Change the border to 2px solid blue when in focus */
+    outline: none; /* Remove the default focus outline if you don't want it */
+    border-radius: 5px;
+}
